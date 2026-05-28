@@ -115,3 +115,95 @@ Puis **reconnecte-toi** pour obtenir un nouveau token ADMIN.
 | GET | `/api/admin/users` | Liste des utilisateurs |
 | PUT | `/api/admin/users/{id}` | Modifier un utilisateur |
 | DELETE | `/api/admin/users/{id}` | Supprimer un utilisateur |
+
+
+====================================================
+STRUCTURE DE LA BASE DE DONNÉES — tp_back
+====================================================
+
+BASE DE DONNÉES : tp_back
+
+----------------------------------------------------
+TABLE : users
+----------------------------------------------------
+| Colonne    | Type         | Contraintes          |
+|------------|--------------|----------------------|
+| id         | INT          | PK, AUTO_INCREMENT   |
+| username   | VARCHAR(255) | NOT NULL, UNIQUE     |
+| email      | VARCHAR(255) | NOT NULL, UNIQUE     |
+| password   | VARCHAR(255) | NOT NULL             |
+| roles      | ENUM         | 'USER', 'ADMIN'      |
+| enabled    | BOOLEAN      | DEFAULT true         |
+| created_at | DATETIME     |                      |
+
+----------------------------------------------------
+TABLE : categories
+----------------------------------------------------
+| Colonne | Type         | Contraintes           |
+|---------|--------------|-----------------------|
+| id      | INT          | PK, AUTO_INCREMENT    |
+| name    | VARCHAR(255) | NOT NULL, UNIQUE      |
+
+----------------------------------------------------
+TABLE : products
+----------------------------------------------------
+| Colonne       | Type         | Contraintes          |
+|---------------|--------------|----------------------|
+| id            | INT          | PK, AUTO_INCREMENT   |
+| name          | VARCHAR(255) | NOT NULL             |
+| description   | TEXT         |                      |
+| price         | FLOAT        | NOT NULL             |
+| categorie_id  | INT          | FK -> categories(id) |
+| stock_quantity| INT          | NOT NULL             |
+| lien_image    | VARCHAR(255) |                      |
+| created_at    | DATETIME     |                      |
+
+----------------------------------------------------
+TABLE : orders
+----------------------------------------------------
+| Colonne      | Type         | Contraintes          |
+|--------------|--------------|----------------------|
+| id           | INT          | PK, AUTO_INCREMENT   |
+| user_id      | INT          | FK -> users(id)      |
+| product_id   | INT          | FK -> products(id)   |
+| order_date   | DATETIME     |                      |
+| total_amount | FLOAT        | NOT NULL             |
+| status       | ENUM         | 'PENDING'            |
+|              |              | 'PROCESSING'         |
+|              |              | 'SHIPPED'            |
+|              |              | 'DELIVERED'          |
+| quantite     | INT          | NOT NULL             |
+
+----------------------------------------------------
+RELATIONS
+----------------------------------------------------
+
+users ──────────────< orders
+(1 utilisateur      (plusieurs commandes)
+peut avoir
+plusieurs commandes)
+
+products ───────────< orders
+(1 produit          (plusieurs commandes)
+peut être dans
+plusieurs commandes)
+
+categories ─────────< products
+(1 catégorie        (plusieurs produits)
+peut avoir
+plusieurs produits)
+
+----------------------------------------------------
+DONNÉES INITIALES (à insérer manuellement)
+----------------------------------------------------
+
+-- Créer une catégorie
+INSERT INTO categories (name) VALUES ('Boulangerie');
+INSERT INTO categories (name) VALUES ('Boissons');
+INSERT INTO categories (name) VALUES ('Epicerie');
+
+-- Passer un utilisateur en ADMIN
+UPDATE users SET roles = 'ADMIN' WHERE username = 'john';
+sauf si un admin est déjà existant 
+
+====================================================
